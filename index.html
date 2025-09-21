@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Enfermería Comunitaria (Temas)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .option-label.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-gray-200">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+        <header class="bg-gray-700 shadow-md rounded-lg p-6 mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-center text-teal-400">Test de Enfermería Comunitaria (Temas 2-8)</h1>
+        </header>
+
+        <!-- Scoreboard -->
+        <div class="bg-gray-700 shadow-md rounded-lg p-4 mb-6 flex justify-around text-center">
+            <div>
+                <p class="text-sm text-gray-400">ACIERTOS</p>
+                <p id="correct-score" class="text-2xl font-bold text-green-400">0</p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-400">ERRORES</p>
+                <p id="incorrect-score" class="text-2xl font-bold text-red-400">0</p>
+            </div>
+        </div>
+
+        <main id="quiz-container">
+            <!-- La pregunta actual se insertará aquí -->
+        </main>
+        
+        <footer class="mt-8 text-center">
+            <button id="next-btn" class="hidden bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-teal-400">
+                Siguiente Pregunta
+            </button>
+            <button id="restart-btn" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-400">
+                Reiniciar Test
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        const quizData = [
+            // TEMA 2
+            {
+                question: "1. ¿Cuál de los siguientes epígrafes no corresponde a un componente de la salud familiar?",
+                options: { a: "Afrontamiento.", b: "Integridad.", c: "Resistencia.", d: "Coherencia." },
+                answer: "b"
+            },
+            {
+                question: "2. La situación en la que se produce un cambio en las relaciones o funcionamiento familiar es la definición del Dx de Enfermería:",
+                options: { a: "Disposición para mejorar los procesos familiares.", b: "Interrupción de los procesos familiares.", c: "Riesgo de deterioro de la vinculación.", d: "Procesos familiares disfuncionales." },
+                answer: "b"
+            },
+            // TEMA 3
+            {
+                question: "3. En la valoración del cansancio de las cuidadoras familiares de personas dependientes contamos con herramientas que nos pueden ayudar a detectar problemas. Una de ella es:",
+                options: { a: "Escala de Goldberg.", b: "Escala de Hamilton.", c: "Escala de Yesavage.", d: "Escala de Zarit." },
+                answer: "d"
+            },
+            {
+                question: "4. Dentro del Plan de Atención a las cuidadoras familiares de Andalucía hay una serie de actividades que se ponen en marcha. Señala cuál no es una de dichas actividades:",
+                options: { a: "Talleres de apoyo.", b: "Suplencia en determinadas tareas.", c: "Seguimiento y atención telefónica.", d: "Fomento de las redes de apoyo, formales e informales." },
+                answer: "b"
+            },
+            // TEMA 5
+            {
+                question: "5. Cuando trabajamos el Dx \"Conocimientos deficientes\", uno de nuestros criterios de resultado puede ser \"Conocimiento: Proceso de la enfermedad\", dentro de este NOC vamos a valorar todos estos indicadores menos:",
+                options: { a: "Qué sabe el paciente sobre los signos y síntomas de las complicaciones de la enfermedad.", b: "Descripción del proceso de enfermedad.", c: "Enseñanza: Dieta prescrita.", d: "Familiaridad con el nombre de la enfermedad." },
+                answer: "c"
+            },
+            {
+                question: "6. La \"Carencia o deficiencia de información cognitiva sobre un tema específico\" corresponde al Dx de Enfermería de:",
+                options: { a: "Gestión ineficaz de la propia salud.", b: "Disposición para mejorar los conocimientos.", c: "Conocimientos deficientes.", d: "Deterioro cognitivo." },
+                answer: "c"
+            },
+            // TEMA 6
+            {
+                question: "7. El diagnóstico de Enfermería 00079 Incumplimiento ... Este diagnóstico no debe usarse:",
+                options: { a: "Cuando el tratamiento a seguir sea muy complejo.", b: "Cuando el paciente no tenga demasiada motivación para seguir los cuidados de Salud.", c: "Cuando hay una falta de pacto de cumplimiento entre la persona y el profesional sanitario.", d: "Cuando tenga dudas sobre qué debe hacer." },
+                answer: "c"
+            },
+            // TEMA 7
+            {
+                question: "8. En la valoración de la capacidad funcional del adulto... Para esta última existe una herramienta clinimétrica... Señale cuál es:",
+                options: { a: "Índice de Barthel.", b: "Cuestionario de Zarit.", c: "Escala de Tinetti.", d: "Cuestionario de Goldberg." },
+                answer: "c"
+            },
+            {
+                question: "9. Los diagnósticos enfermeros que detectan déficits en autocuidados... no debemos usarlos cuando:",
+                options: { a: "La persona no sepa cómo realizar sus autocuidados.", b: "Existe un deterioro cognitivo.", c: "Hay una limitación del movimiento.", d: "No es posible aumentar su capacidad de autocuidados." },
+                answer: "d"
+            },
+            // TEMA 8
+            {
+                question: "10. Debemos usar el Diagnóstico de Enfermería Riesgo de Lesión cuando: (Señale la incorrecta)",
+                options: { a: "Cuando no sea posible formular un Dx más preciso.", b: "Cuando existen factores externos que pueden ser modificados.", c: "Cuando la persona haga todo lo que puede para disminuir el riesgo.", d: "Cuando el riesgo tenga su origen en la conducta inapropiada de la persona o cuidador." },
+                answer: "c"
+            },
+            // Page 3 questions
+            {
+                question: "11. Sabemos sobres las toxiinfecciones alimentarias:",
+                options: { a: "El agente causal más importante de las gastroenteritis bacterianas es el Staphylococcus aureus.", b: "El botulismo se transmite principalmente por el pan y sus derivados.", c: "Entre los factores contribuyentes de las toxiinfecciones encontramos el elevado recalentamiento de los alimentos.", d: "El rotavirus es el agente causal más importante de diarreas víricas y el virus de Norwalk en los adultos." },
+                answer: "d"
+            },
+            {
+                question: "12. En el Reglamento sanitario internacional se describe la creación de determinados grupos asesores entre los que no se encuentran.",
+                options: { a: "Comité de emergencias.", b: "Comité de examen.", c: "Comité de control.", d: "Lista de expertos." },
+                answer: "c"
+            },
+            {
+                question: "13. La Drogodependencia es el estado de intoxicación periódica o crónica... y caracterizada por:",
+                options: { a: "Efectos nocivos tan sólo para el individuo.", b: "Dependencia física y/o patológica por la retirada de la droga lo que se denomina tolerancia.", c: "Deseo de continuar y conseguir la sustancia a cualquier precio sin necesidad de ir incrementando la dosis.", d: "Pueden producir dos tipos de dependencia: física y social." },
+                answer: "d"
+            },
+            {
+                question: "14. Sobre las parasitosis en humanos conocemos una serie de generalidades entre las que se encuentran:",
+                options: { a: "Contribuyen a un importante problema de salud pública en los países desarrollados.", b: "Sus agentes causales son los protozoos, nematodos, cestodos y artrópodos.", c: "En los casos de sospecha de pediculosis se debe usar para prevenir la permetrina.", d: "A y B son correctas." },
+                answer: "b"
+            },
+            {
+                question: "15. En el funcionamiento familiar valoramos la capacidad de la familia para satisfacer las necesidades de sus miembros... No incluye:",
+                options: { a: "La normalización familiar.", b: "Organización familiar.", c: "Desarrollo de los procesos familiares.", d: "Estudio del mantenimiento del hogar." },
+                answer: "a"
+            },
+            {
+                question: "16. En el proceso Asistencial Integrado (PAI) de Riesgo Vascular de 2010 es cierto que encontramos.",
+                options: { a: "En su definición funcional se insta a identificar a las personas con factores de riesgo vascular y /o enfermedad vascular conocida.", b: "Gracias a la tabla Score podemos determinar dicho riesgo vascular en base a la edad, sexo, tabaquismo, cifras de colesterol total y de presión sistólica.", c: "El riesgo vascular absoluto es la probabilidad de presentar un episodio vascular crónico en un periodo de tiempo concreto que suele fijarse en 20 años.", d: "A y B son correctas." },
+                answer: "d"
+            },
+            {
+                question: "17. La valoración enfermera de la población inmigrante debe incluir un elemento diferenciador... y tener en cuenta.",
+                options: { a: "Identificar los aspecto positivos hacía la salud que presentan en función de su cultura.", b: "No es determinante el origen étnico de la persona.", c: "Las prácticas de salud deben ser valoradas con idea de que se ciñan a las de nuestro país.", d: "Las preferencias y prohibiciones alimentarias de acuerdo a su cultura no son relevantes." },
+                answer: "a"
+            },
+            {
+                question: "18. En las medidas de prevención de la ITS es fundamental el control de contactos sexuales... Una de las siguientes acciones no está incluida dentro de dicho control.",
+                options: { a: "El tratamiento de los contactos que puede realizarse sobre el diagnóstico epidemiológico.", b: "La educación sanitaria incluye la adaptación al tratamiento si procede.", c: "La localización de los contactos debe hacerla siempre el personal sanitario.", d: "La definición de los contactos que hay que localizar que va a depender del periodo de incubación de la infección detectada." },
+                answer: "c"
+            },
+            {
+                question: "19. La salud de la población inmigrante se encuentra determinada por los siguientes factores excepto.",
+                options: { a: "Determinantes culturales.", b: "Socio económico.", c: "Del sistema sanitario, ya que esta población tiene un acceso facilitado no existiendo barreras.", d: "Biológicos o ambientales." },
+                answer: "c"
+            },
+            {
+                question: "20. A la dependencia se llega por la participación de diversos factores que ordenados secuencialmente encontramos:",
+                options: { a: "Anomalia, deficiencia, discapacidad, minusvalía.", b: "Anomalía, déficit de funcionamiento, limitación de la actividad, restricción de la participación.", c: "A y B son incorrectas.", d: "A y B son correctas." },
+                answer: "b"
+            },
+            {
+                question: "21. En el estudio de la discapacidad en nuestro ámbito comunitario y los distintos recursos para abordarla afirmamos (señale la correcta).",
+                options: { a: "La ley de Promoción de la Autonomía personal... establece cuatro grados de situación de dependencia.", b: "El servicio de ayuda a domicilio se concede a todas las personas con problemas de dependencia.", c: "Una de las funciones de los profesionales de la salud es el asesoramiento de la persona exclusivamente.", d: "El sistema de información para la discapacidad (SID) es un portal temático en internet." },
+                answer: "d"
+            },
+            {
+                question: "22. La EPOC es otra de las enfermedades crónicas que encontramos en la comunidad más prevalentes. Es cierto que:",
+                options: { a: "Su prevalencia entre las personas de 40-80 años es del 25%.", b: "La mayoría de los pacientes con restricción del flujo aéreo tiene como antecedente el tabaquismo."},
+                answer: "b"
+            },
+            {
+                question: "23. Si nos adentramos en la epidemiología del cáncer, el 30% de los mismos a nivel mundial son debido a 5 factores conductuales-dietéticos entre los que NO se encuentra:",
+                options: { a: "Falta de ejercicio físico.", b: "IMC elevado.", c: "Consumo reducido de carnes y frutas.", d: "Ingesta de tabaco." },
+                answer: "c"
+            },
+            {
+                question: "24. En cuanto a las enfermedades transmitidas por animales, ¿cuál de las siguientes afirmaciones es FALSA?",
+                options: { a: "Se conocen como zoonosis y animales vertebrados e invertebrados las transmiten.", b: "Actualmente hay descritas más de 150 zoonosis.", c: "Más del 70% de las enfermedades infecciosas emergentes tienen su origen en los animales.", d: "Su aumento se debe a la disminución del número de animales de compañía." },
+                answer: "d"
+            },
+            {
+                question: "25. Sobre los factores de riesgo de las enfermedades cardiovasculares, NO es cierto:",
+                options: { a: "La presencia de dislipemias supone un riesgo lineal de cardiopatía isquémica.", b: "El tabaquismo aumenta la adherencia plaquetaria.", c: "La presencia de diabetes acelera la arteriosclerosis.", d: "El tratamiento antihipertensivo reduce en un 5% el desarrollo de enfermedad cardiovascular." },
+                answer: "d"
+            },
+            {
+                question: "26. Para evitar la contaminación y la proliferación de microorganismos (señala la correcta).",
+                options: { a: "Conservar inmediatamente crudos junto a cocinados.", b: "Almacenar los alimentos de más reciente adquisición delante.", c: "Un manipulador con enfermedad transmisible puede trabajar con mascarilla y guantes.", d: "En el cuidado de las cocinas evitar barrer en seco." },
+                answer: "d"
+            },
+            {
+                question: "27. Sobre la tuberculosis, consideraremos INCORRECTO:",
+                options: { a: "La prueba de Mantoux diagnostica la enfermedad tuberculosa.", b: "Los profesionales sanitarios son personas susceptibles de padecer la enfermedad.", c: "Se debe aislar a los pacientes en determinadas fases.", d: "Sobre el huésped susceptible se debe usar la quimioprofilaxis." },
+                answer: "a"
+            },
+            {
+                question: "28. En el cuidado que deben recibir las personas diabéticas en atención primaria (señale la CIERTA):",
+                options: { a: "La educación diabetológica puede ser de dos tipos, individual o grupal.", b: "En el cribado de complicaciones se controla exclusivamente la nefropatía y el riesgo cardiovascular.", c: "El control de la HbA1c debe estar por debajo de 8 y el IMC por debajo de 30.", d: "Todas las anteriores son correctas" },
+                answer: "a"
+            },
+            {
+                question: "29. El diagnóstico enfermero 00078 Gestión ineficaz de salud. No debe usarse cuando:",
+                options: { a: "La persona decide abandonar el régimen terapéutico voluntariamente.", b: "La persona no es capaz de integrarlo en su cotidianidad.", c: "Existe una relación de desconfianza con los profesionales.", d: "Tiene creencias contrarias al régimen terapéutico." },
+                answer: "a"
+            },
+            {
+                question: "30. 'Situación en la que la persona ve limitada su capacidad para moverse...' Podemos considerar CIERTO:",
+                options: { a: "La escala de Tinetti nos puede ayudar a saber el grado.", b: "Pertenece al Dx 00092- Intolerancia a la actividad.", c: "Pertenece al Dx 00085- Deterioro de la movilidad física.", d: "A y C son ciertas." },
+                answer: "d"
+            },
+            {
+                question: "31. El diagnóstico enfermero 00035 'Riesgo de lesión' está asociado a factores de riesgo internos. ¿Cuál es uno de ellos?",
+                options: { a: "Venenos, contaminantes.", b: "Malnutrición.", c: "Nivel de inmunización de la comunidad.", d: "Agentes nosocomiales." },
+                answer: "b"
+            },
+            {
+                question: "32. Sobre el cuidado informal y los cuidadores (señala la INCORRECTA):",
+                options: { a: "En su mayoría son mujeres, con parentesco directo y nivel de estudios bajo.", b: "En Andalucía no se realizan talleres de apoyo ni captación de cuidadoras.", c: "El plan de atención a cuidadoras define a las de grandes discapacitados.", d: "Se puede formular el Dx 'cansancio del rol del cuidador'." },
+                answer: "b"
+            },
+            {
+                question: "33. Sobre el círculo del rol del drogodependiente, detecta cuál es INCORRECTO.",
+                options: { a: "La exclusión social conduce a la marginalidad y delincuencia.", b: "Rechazar los programas de desintoxicación inicia el círculo.", c: "El deterioro de su entorno se identifica con la pérdida de control.", d: "La pérdida de habilidades psicosociales afecta su visión de la realidad." },
+                answer: "b"
+            },
+            {
+                question: "34. Sobre el Dx Enfermero 'Conocimientos deficientes', NO podemos afirmar:",
+                options: { a: "Dentro de las NOCs aplicables está 'conocimientos'.", b: "En la valoración se debe tener en cuenta la capacidad de aprendizaje.", c: "Puede usarse cuando la falta de conocimiento sea la causa de otra respuesta humana.", d: "La motivación es un factor a valorar." },
+                answer: "c"
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        const nextButton = document.getElementById('next-btn');
+        const restartButton = document.getElementById('restart-btn');
+        const correctScoreElem = document.getElementById('correct-score');
+        const incorrectScoreElem = document.getElementById('incorrect-score');
+
+        let currentQuestionIndex = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            updateScoreboard();
+            showQuestion();
+            nextButton.classList.add('hidden');
+            restartButton.classList.add('hidden');
+        }
+        
+        function showQuestion() {
+            quizContainer.innerHTML = '';
+            nextButton.classList.add('hidden');
+
+            if (currentQuestionIndex >= quizData.length) {
+                showFinalResults();
+                return;
+            }
+
+            const item = quizData[currentQuestionIndex];
+            let questionHTML = `
+                <div class="bg-gray-700 shadow-md rounded-lg p-6 question-card">
+                    <p class="font-semibold text-lg mb-4">${item.question}</p>
+                    <div class="space-y-3 options-container">
+            `;
+            for(const key in item.options) {
+                questionHTML += `
+                    <label data-key="${key}" class="option-label flex items-center p-3 rounded-lg border border-gray-600 hover:bg-gray-600 transition cursor-pointer">
+                        <span class="ml-3 text-gray-300">${key.toUpperCase()}. ${item.options[key]}</span>
+                    </label>
+                `;
+            }
+            questionHTML += `</div></div>`;
+            quizContainer.innerHTML = questionHTML;
+
+            const options = quizContainer.querySelectorAll('.option-label');
+            options.forEach(option => {
+                option.addEventListener('click', handleOptionSelect);
+            });
+        }
+
+        function handleOptionSelect(event) {
+            const selectedLabel = event.currentTarget;
+            const userAnswer = selectedLabel.dataset.key;
+            const correctAnswer = quizData[currentQuestionIndex].answer;
+            const optionsContainer = selectedLabel.parentElement;
+
+            optionsContainer.querySelectorAll('.option-label').forEach(label => {
+                label.classList.add('disabled');
+            });
+
+            const correctLabel = optionsContainer.querySelector(`label[data-key="${correctAnswer}"]`);
+
+            if (userAnswer === correctAnswer) {
+                correctCount++;
+                selectedLabel.classList.remove('border-gray-600', 'hover:bg-gray-600');
+                selectedLabel.classList.add('bg-green-500/20', 'border-green-500');
+            } else {
+                incorrectCount++;
+                selectedLabel.classList.remove('border-gray-600', 'hover:bg-gray-600');
+                selectedLabel.classList.add('bg-red-500/20', 'border-red-500');
+                if (correctLabel) {
+                    correctLabel.classList.remove('border-gray-600', 'hover:bg-gray-600');
+                    correctLabel.classList.add('bg-green-500/20', 'border-green-500');
+                }
+            }
+
+            updateScoreboard();
+            nextButton.classList.remove('hidden');
+        }
+        
+        function showFinalResults() {
+            quizContainer.innerHTML = `
+                <div class="bg-gray-700 shadow-md rounded-lg p-6 text-center">
+                    <h2 class="text-2xl font-bold mb-4 text-teal-400">¡Test Completado!</h2>
+                    <p class="text-lg text-gray-300">Has finalizado el cuestionario.</p>
+                </div>
+            `;
+            nextButton.classList.add('hidden');
+            restartButton.classList.remove('hidden');
+        }
+
+        function updateScoreboard() {
+            correctScoreElem.textContent = correctCount;
+            incorrectScoreElem.textContent = incorrectCount;
+        }
+
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            showQuestion();
+        });
+
+        restartButton.addEventListener('click', startQuiz);
+
+        // Initial start
+        startQuiz();
+    </script>
+</body>
+</html>
